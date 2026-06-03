@@ -56,7 +56,6 @@ CORE_FILES = [
     "integrity.py",
     "plugin_base.py",
     "sqlite_utils.py",
-    "terminal.py",
 ]
 
 MANIFEST_FILE = "integrity_manifest.json"
@@ -115,8 +114,7 @@ def generate_manifest() -> dict:
 def save_manifest() -> str:
     """Generate and save the integrity manifest. Returns the manifest path."""
     manifest = generate_manifest()
-    manifest_path = get_manifest_path()
-    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path = pkg / MANIFEST_FILE
     with open(manifest_path, "w", encoding="utf-8") as f:
         json.dump({
             "generated": _utc_iso(),
