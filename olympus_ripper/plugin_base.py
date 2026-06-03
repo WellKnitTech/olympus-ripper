@@ -20,6 +20,11 @@ class ArtifactPlatform(Enum):
     MACOS = "macos"
 
 
+class HostPlatform(Enum):
+    WINDOWS = "windows"
+    MACOS = "macos"
+
+
 class ArtifactCategory(Enum):
     PERSISTENCE = "persistence"
     EXECUTION = "execution"
@@ -95,6 +100,11 @@ class OlympusPlugin(ABC):
     def mitre_references(self) -> list[str]:
         """MITRE ATT&CK technique IDs this plugin covers."""
         return []
+
+    @property
+    def supported_hosts(self) -> list[HostPlatform]:
+        """Host operating systems where this plugin is expected to run."""
+        return [HostPlatform.MACOS, HostPlatform.WINDOWS]
 
     @abstractmethod
     def run(self, target: str, **kwargs) -> list[Finding]:

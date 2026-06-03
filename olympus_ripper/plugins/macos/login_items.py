@@ -9,9 +9,9 @@ Extracts login items from various macOS persistence locations:
 """
 
 import plistlib
-import sqlite3
 from pathlib import Path
 from ...plugin_base import ArtifactCategory, Finding, MacArtifactPlugin
+from ...sqlite_utils import connect_sqlite_readonly
 
 
 class LoginItemsPlugin(MacArtifactPlugin):
@@ -131,7 +131,7 @@ class LoginItemsPlugin(MacArtifactPlugin):
 
         # Try SQLite (macOS 14+ BackgroundItems-v4.btm)
         try:
-            conn = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+            conn = connect_sqlite_readonly(path)
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM sqlite_master WHERE type='table'")
             tables = [r[1] for r in cursor.fetchall()]

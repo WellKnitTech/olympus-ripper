@@ -23,5 +23,5 @@ class JSONFormatter:
         return json.dumps(output, indent=2, default=str)
 
     def write_to_file(self, findings: list[dict], filepath: str, target: str = "") -> None:
-        with open(filepath, "w") as f:
+        with open(filepath, "w", encoding="utf-8") as f:
             f.write(self.format(findings, target))

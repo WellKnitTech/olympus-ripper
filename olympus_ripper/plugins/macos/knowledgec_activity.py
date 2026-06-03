@@ -7,16 +7,17 @@ device lock/unlock, screen time, web visits, and interactions.
 Note: macOS 13+ migrates much of this to Biome format.
 """
 
-import sqlite3
 from datetime import datetime, timezone, timedelta
+from typing import Optional
 from ...plugin_base import ArtifactCategory, Finding, MacArtifactPlugin
+from ...sqlite_utils import connect_sqlite_readonly
 
 
 # macOS Absolute Time epoch: 2001-01-01 00:00:00 UTC
 MAC_EPOCH = datetime(2001, 1, 1, tzinfo=timezone.utc)
 
 
-def mac_absolute_to_datetime(mac_ts: float) -> datetime | None:
+def mac_absolute_to_datetime(mac_ts: float) -> Optional[datetime]:
     """Convert Mac Absolute Time to datetime."""
     if mac_ts is None or mac_ts == 0:
         return None
@@ -57,8 +58,7 @@ class KnowledgeCActivityPlugin(MacArtifactPlugin):
         findings = []
 
         try:
-            conn = sqlite3.connect(f"file:{target}?mode=ro", uri=True)
-            conn.row_factory = sqlite3.Row
+            conn = connect_sqlite_readonly(target, row_factory=True)
             cursor = conn.cursor()
         except Exception as e:
             findings.append(Finding(
