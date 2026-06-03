@@ -40,5 +40,5 @@ class TimelineFormatter:
         self, findings: list[dict], filepath: str,
         target: str = "", hostname: str = "UNKNOWN"
     ) -> None:
-        with open(filepath, "w", newline="") as f:
+        with open(filepath, "w", newline="", encoding="utf-8") as f:
             f.write(self.format(findings, target, hostname))

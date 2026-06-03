@@ -45,6 +45,7 @@ CORE_FILES = [
     "engine.py",
     "integrity.py",
     "plugin_base.py",
+    "sqlite_utils.py",
 ]
 
 MANIFEST_FILE = ".integrity_manifest.json"
@@ -74,7 +75,7 @@ def save_manifest() -> str:
     pkg = _get_package_dir()
     manifest = generate_manifest()
     manifest_path = pkg / MANIFEST_FILE
-    with open(manifest_path, "w") as f:
+    with open(manifest_path, "w", encoding="utf-8") as f:
         json.dump({
             "generated": datetime.datetime.utcnow().isoformat() + "Z",
             "tool": "Olympus Ripper",
@@ -106,7 +107,7 @@ def verify_self_integrity(quiet: bool = False) -> bool:
 
     # Load stored manifest
     try:
-        with open(manifest_path) as f:
+        with open(manifest_path, encoding="utf-8") as f:
             stored = json.load(f)
     except (json.JSONDecodeError, IOError):
         if not quiet:
@@ -204,7 +205,7 @@ def write_hash_index(output_files: list[str], target: str, hostname: str = "UNKN
     except ImportError:
         pass
 
-    with open(index_path, "w") as f:
+    with open(index_path, "w", encoding="utf-8") as f:
         json.dump(index, f, indent=2)
 
     return index_path

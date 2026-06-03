@@ -93,6 +93,6 @@ class TextFormatter:
         # Write without color codes to file
         old_color = self.color
         self.color = False
-        with open(filepath, "w") as f:
+        with open(filepath, "w", encoding="utf-8") as f:
             f.write(self.format(findings, target) + "\n")
         self.color = old_color
