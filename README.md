@@ -170,6 +170,8 @@ oripper list
 oripper rehash
 ```
 
+Integrity manifests are stored in a user-writable application config directory instead of the installed package directory. Set `ORIPPER_CONFIG_DIR` to choose a config directory, or `ORIPPER_INTEGRITY_MANIFEST` to point at a specific manifest file for testing or controlled deployments.
+
 ## Writing Custom Plugins
 
 Create a `.py` file in any directory and point `--plugin-dir` at it:

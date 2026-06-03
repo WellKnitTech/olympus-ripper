@@ -8,6 +8,7 @@ Note: macOS 13+ migrates much of this to Biome format.
 """
 
 from datetime import datetime, timezone, timedelta
+from typing import Optional
 from ...plugin_base import ArtifactCategory, Finding, MacArtifactPlugin
 from ...sqlite_utils import connect_sqlite_readonly
 
@@ -16,7 +17,7 @@ from ...sqlite_utils import connect_sqlite_readonly
 MAC_EPOCH = datetime(2001, 1, 1, tzinfo=timezone.utc)
 
 
-def mac_absolute_to_datetime(mac_ts: float) -> datetime | None:
+def mac_absolute_to_datetime(mac_ts: float) -> Optional[datetime]:
     """Convert Mac Absolute Time to datetime."""
     if mac_ts is None or mac_ts == 0:
         return None

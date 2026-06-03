@@ -11,7 +11,7 @@ import json
 import subprocess
 from datetime import datetime
 from pathlib import Path
-from ...plugin_base import ArtifactCategory, Finding, MacArtifactPlugin
+from ...plugin_base import ArtifactCategory, Finding, HostPlatform, MacArtifactPlugin
 
 
 class UnifiedLogPlugin(MacArtifactPlugin):
@@ -29,6 +29,11 @@ class UnifiedLogPlugin(MacArtifactPlugin):
     @property
     def mitre_references(self) -> list[str]:
         return ["T1059", "T1078"]
+
+    @property
+    def supported_hosts(self) -> list[HostPlatform]:
+        # Apple's `log` command is only available on macOS hosts.
+        return [HostPlatform.MACOS]
 
     # Predicate filters for security-relevant log events
     SECURITY_PREDICATES = {

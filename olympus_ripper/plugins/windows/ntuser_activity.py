@@ -8,6 +8,7 @@ MRU lists, and other user-specific artifacts from NTUSER.DAT.
 
 import struct
 from datetime import datetime, timezone
+from typing import Optional
 from ...plugin_base import ArtifactCategory, Finding, RegistryPlugin
 
 try:
@@ -29,7 +30,7 @@ def rot13(s: str) -> str:
     return "".join(result)
 
 
-def filetime_to_datetime(ft: int) -> datetime | None:
+def filetime_to_datetime(ft: int) -> Optional[datetime]:
     """Convert Windows FILETIME (100-ns intervals since 1601-01-01) to datetime."""
     if ft == 0 or ft is None:
         return None

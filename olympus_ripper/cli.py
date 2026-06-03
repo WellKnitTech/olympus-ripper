@@ -20,11 +20,23 @@ from .engine import RipperEngine
 from .plugin_base import ArtifactCategory, ArtifactPlatform
 from .formatters import TextFormatter, JSONFormatter, CSVFormatter, TimelineFormatter
 from .integrity import verify_self_integrity, hash_output_file, write_hash_index, save_manifest
+from .terminal import should_use_color
 
 
-def show_olympus_banner(script_label: str = "Olympus Ripper", classification: str = "CONFIDENTIAL") -> None:
+def show_olympus_banner(
+    script_label: str = "Olympus Ripper",
+    classification: str = "CONFIDENTIAL",
+    color: bool = True,
+) -> None:
     """Display the official Olympus Cyber banner — art floats free, box around info only."""
     import datetime
+
+    if not color:
+        ts = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+        print(f"\n{script_label} v{__version__}")
+        print(f"Generated: {ts}")
+        print(f"Classification: {classification}\n")
+        return
 
     B  = "\033[38;5;27m"    # dark blue  — frame + OLYMPUS bottom rows
     b  = "\033[38;5;33m"    # blue       — OLYMPUS mid rows
@@ -35,7 +47,7 @@ def show_olympus_banner(script_label: str = "Olympus Ripper", classification: st
     G  = "\033[38;5;178m"   # gold       — classification
     R  = "\033[0m"          # reset
 
-    ts = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+    ts = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
 
     # Center text within the 63-char box interior
     def center_text(text, width=63):
@@ -194,7 +206,7 @@ def cmd_rip(args, engine: RipperEngine) -> None:
         hive_type=args.hive_type,
     )
 
-    formatter = get_formatter(args.format, color=not args.no_color)
+    formatter = get_formatter(args.format, color=getattr(args, "use_color", not args.no_color))
 
     if args.output:
         if hasattr(formatter, "write_to_file"):
@@ -218,7 +230,7 @@ def cmd_volume(args, engine: RipperEngine) -> None:
     vol_path = str(Path(args.path).resolve())
     findings = engine.rip_volume(vol_path, plugins=args.plugins)
 
-    formatter = get_formatter(args.format, color=not args.no_color)
+    formatter = get_formatter(args.format, color=getattr(args, "use_color", not args.no_color))
 
     if args.output:
         kwargs = {"target": vol_path}
@@ -250,14 +262,16 @@ def cmd_list(args, engine: RipperEngine) -> None:
         print("[!] No plugins match the given filters.")
         return
 
-    print(f"\n{'Name':<30} {'Platform':<10} {'Category':<18} {'Description'}")
-    print("─" * 95)
+    print(f"\n{'Name':<30} {'Platform':<10} {'Category':<18} {'Hosts':<14} {'Description'}")
+    rule_char = "─" if getattr(args, "use_color", True) else "-"
+    print(rule_char * 112)
     for p in plugins:
         mitre = ", ".join(p.mitre_references) if p.mitre_references else ""
         desc = p.description
+        hosts = ",".join(h.value for h in p.supported_hosts)
         if mitre:
             desc += f" [{mitre}]"
-        print(f"{p.name:<30} {p.platform.value:<10} {p.category.value:<18} {desc}")
+        print(f"{p.name:<30} {p.platform.value:<10} {p.category.value:<18} {hosts:<14} {desc}")
     print(f"\n  Total: {len(plugins)} plugin(s)")
 
 
@@ -275,6 +289,7 @@ def cmd_info(args, engine: RipperEngine) -> None:
     print(f"  Version: {plugin.version}")
     print(f"  Platform: {plugin.platform.value}")
     print(f"  Category: {plugin.category.value}")
+    print(f"  Supported Hosts: {', '.join(h.value for h in plugin.supported_hosts)}")
 
     if isinstance(plugin, RegistryPlugin):
         print(f"  Hive Type: {plugin.hive_type}")
@@ -305,17 +320,20 @@ def main():
     parser = build_parser()
     args = parser.parse_args()
 
+    use_color = should_use_color(args.no_color)
+    args.use_color = use_color
+
     if not args.command:
-        show_olympus_banner()
+        show_olympus_banner(color=use_color)
         parser.print_help()
         sys.exit(0)
 
     quiet = args.quiet if hasattr(args, "quiet") else False
     if not quiet:
-        show_olympus_banner()
+        show_olympus_banner(color=use_color)
 
     # Self-integrity check (runs before every command)
-    verify_self_integrity(quiet=quiet)
+    verify_self_integrity(quiet=quiet, color=use_color)
 
     engine = RipperEngine(
         plugin_dirs=args.plugin_dir if hasattr(args, "plugin_dir") else [],
