@@ -2,7 +2,7 @@
 
 **Hybrid Forensic Artifact Parser** — by Olympus Cyber
 
-A macOS-native CLI tool that parses both Windows Registry hives and macOS forensic artifacts through a unified plugin architecture. Inspired by Harlan Carvey's RegRipper, rebuilt in Python for cross-platform IR workflows.
+A Python CLI tool that parses both Windows Registry hives and macOS forensic artifacts through a unified plugin architecture. Inspired by Harlan Carvey's RegRipper, rebuilt for cross-platform IR workflows on macOS and Windows analyst hosts.
 
 ## Install
 
@@ -215,9 +215,19 @@ oripper rip /path/to/artifact.db -P /path/to/my/plugins/
 ## Requirements
 
 - Python 3.9+
-- macOS (recommended) or Linux
+- Host OS: macOS or Windows
 - `python-registry` — Windows Registry hive parsing
 - `regipy` — Extended Registry artifact extraction
+
+## Support Matrix
+
+| Host OS | Windows Registry artifacts | macOS artifacts | Notes |
+|---------|----------------------------|-----------------|-------|
+| macOS | Supported | Supported | Recommended host for macOS live collection and Unified Logs because the `macos_unified_logs` plugin uses Apple's `/usr/bin/log` command. |
+| Windows | Supported | Supported for offline SQLite, plist, and filesystem artifacts | Unified Logs are degraded on Windows because Apple's `/usr/bin/log` command is not available. Use exported artifacts where possible. |
+| Linux | Not currently targeted | Not currently targeted | Linux may work for some pure-Python offline parsing, but it is not part of the supported host matrix. |
+
+Artifact platform scope is currently limited to Windows and macOS. Linux artifact parsing is not implemented.
 
 ## License
 

@@ -10,6 +10,7 @@ Critical for detecting unauthorized access grants and persistence.
 import sqlite3
 from datetime import datetime, timezone
 from ...plugin_base import ArtifactCategory, Finding, MacArtifactPlugin
+from ...sqlite_utils import connect_sqlite_readonly
 
 
 class TCCPermissionsPlugin(MacArtifactPlugin):
@@ -71,8 +72,7 @@ class TCCPermissionsPlugin(MacArtifactPlugin):
         findings = []
 
         try:
-            conn = sqlite3.connect(f"file:{target}?mode=ro", uri=True)
-            conn.row_factory = sqlite3.Row
+            conn = connect_sqlite_readonly(target, row_factory=True)
             cursor = conn.cursor()
         except Exception as e:
             findings.append(Finding(

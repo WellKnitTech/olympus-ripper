@@ -27,5 +27,5 @@ class CSVFormatter:
         return buf.getvalue()
 
     def write_to_file(self, findings: list[dict], filepath: str, target: str = "") -> None:
-        with open(filepath, "w", newline="") as f:
+        with open(filepath, "w", newline="", encoding="utf-8") as f:
             f.write(self.format(findings, target))
